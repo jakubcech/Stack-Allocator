@@ -9,6 +9,9 @@
 
 #include <stdio.h>
 #include <tchar.h>
+#include <assert.h> 
+#include <cstdint>
+#include <vector>
 
 
 

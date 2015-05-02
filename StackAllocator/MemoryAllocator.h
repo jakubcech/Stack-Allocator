@@ -1,7 +1,6 @@
 #pragma once
 #include "stdafx.h"
 
-
 // Reserves a memory block on the heap. The block is reserved and maintained in a stack-like fashion and used for further allocations within the block itself.
 // The sizeBytes_ of the block itself is at most 'uint32_t' bytes.
 // A 'stackMarker' is maintained to point to the top of the 'stack'. Every allocation moves the stack marker up by the sizeBytes_ of the individual allocation.
@@ -30,7 +29,7 @@ public:
 	virtual void clearEntireMemoryBlock();
 	
 	// Free the memory to the marker used before last using the allocateMemoryInBlock() function.
-	virtual void freeUnalignedMemory(void * pMemory);
+	virtual void* freeUnalignedMemory(void * pMemory);
 
 	// Free the memory to the marker used before last using the allocateMemoryInBlock() function.
 	virtual void freeAlignedMemory(void * pMemory);

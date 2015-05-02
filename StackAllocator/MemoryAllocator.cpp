@@ -2,7 +2,6 @@
 #include "MemoryAllocator.h"
 
 
-
 // Constructs a stack allocator of the given stackSizeBytes_, reserving a new memory block. 
 MemoryAllocator::MemoryAllocator(size_t stackSizeBytes_)
 {
@@ -13,13 +12,19 @@ MemoryAllocator::MemoryAllocator(size_t stackSizeBytes_)
 
 void *MemoryAllocator::allocateUnalignedMemoryBlock(size_t sizeBytes_)
 {
-	topMarker_ = memoryBlock_[sizeBytes_];
 	lastMarker_ = topMarker_;
+	uintptr_t memoryBlock = sizeBytes_;
+
+	ptrdiff_t allocatedAddress = topMarker_ + memoryBlock;
+
+	topMarker_ = allocatedAddress;
+
 	uint8_t *pMemory = reinterpret_cast<uint8_t*>(topMarker_);
+
 	return static_cast<void*>(pMemory);
 }
 
-void * MemoryAllocator::allocateAlignedMemoryBlock(size_t sizeBytes_, size_t memoryAlignment_)
+void *MemoryAllocator::allocateAlignedMemoryBlock(size_t sizeBytes_, size_t memoryAlignment_)
 {
 	assert(memoryAlignment_ >= 2);
 	assert(memoryAlignment_ <= 128);
@@ -46,15 +51,37 @@ void * MemoryAllocator::allocateAlignedMemoryBlock(size_t sizeBytes_, size_t mem
 	uint8_t *pAlignedMemory = reinterpret_cast<uint8_t*>(alignedAddress);
 	pAlignedMemory[-1] = static_cast<uint8_t>(adjustment);
 
+
+	lastMarker_ = topMarker_;
 	topMarker_ = alignedAddress;
+
 	return static_cast<void*>(pAlignedMemory);
 }
 
 
 // TODO
-void MemoryAllocator::freeUnalignedMemory(void * pMemory)
+void *MemoryAllocator::freeUnalignedMemory(void * pMemory)
 {
+	ptrdiff_t adjustment = topMarker_ - lastMarker_;
+	topMarker_ - adjustment;
 
+	void *pFreedMemory = reinterpret_cast<void*>(topMarker_);
+	return (pFreedMemory);
+}
+
+void MemoryAllocator::freeAlignedMemory(void * pMemory)
+{
+	const uint8_t *pAlignedMemory = reinterpret_cast<const uint8_t*>(pMemory);
+
+	uintptr_t alignedAddress = reinterpret_cast<uintptr_t>(pMemory);
+
+	ptrdiff_t adjustment = static_cast<ptrdiff_t>(pAlignedMemory[-1]);
+
+	uintptr_t rawMemoryAddress = alignedAddress - adjustment;
+
+	void *pRawMem = reinterpret_cast<void*>(rawMemoryAddress);
+
+	freeUnalignedMemory(pMemory);
 }
 
 void MemoryAllocator::clearEntireMemoryBlock()

@@ -7,7 +7,6 @@ MemoryAllocator::MemoryAllocator(size_t stackSizeBytes_)
 {
 	memoryBlock_ = new uint8_t[stackSizeBytes_];
 	topMarker_ = reinterpret_cast<uintptr_t>(memoryBlock_);
-	originalMarker_ = topMarker_;
 }
 
 void *MemoryAllocator::allocateUnalignedMemoryBlock(size_t sizeBytes_)
@@ -51,15 +50,13 @@ void *MemoryAllocator::allocateAlignedMemoryBlock(size_t sizeBytes_, size_t memo
 	uint8_t *pAlignedMemory = reinterpret_cast<uint8_t*>(alignedAddress);
 	pAlignedMemory[-1] = static_cast<uint8_t>(adjustment);
 
-
 	lastMarker_ = topMarker_;
 	topMarker_ = alignedAddress;
 
 	return static_cast<void*>(pAlignedMemory);
 }
 
-
-// TODO
+// Free the last unaligned aligned memory block.
 void *MemoryAllocator::freeUnalignedMemory(void * pMemory)
 {
 	ptrdiff_t adjustment = topMarker_ - lastMarker_;
@@ -69,6 +66,7 @@ void *MemoryAllocator::freeUnalignedMemory(void * pMemory)
 	return (pFreedMemory);
 }
 
+// Free the last aligned memory block.
 void MemoryAllocator::freeAlignedMemory(void * pMemory)
 {
 	const uint8_t *pAlignedMemory = reinterpret_cast<const uint8_t*>(pMemory);
@@ -82,11 +80,6 @@ void MemoryAllocator::freeAlignedMemory(void * pMemory)
 	void *pRawMem = reinterpret_cast<void*>(rawMemoryAddress);
 
 	freeUnalignedMemory(pMemory);
-}
-
-void MemoryAllocator::clearEntireMemoryBlock()
-{
-	MemoryAllocator::~MemoryAllocator();
 }
 
 MemoryAllocator::~MemoryAllocator() { delete[] memoryBlock_; }

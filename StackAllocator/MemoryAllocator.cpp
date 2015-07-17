@@ -5,9 +5,11 @@
 // Constructs a stack allocator of the given stackSizeBytes_, reserving a new memory block. 
 MemoryAllocator::MemoryAllocator(size_t stackSizeBytes_)
 {
+	(stackSizeBytes_ / 2) == 0 ? stackSizeBytes_ : stackSizeBytes_ + 1;
 	memoryBlock_ = new uint8_t[stackSizeBytes_];
 	topMarker_ = reinterpret_cast<uintptr_t>(memoryBlock_);
 }
+
 
 void *MemoryAllocator::allocateUnalignedMemoryBlock(size_t sizeBytes_)
 {
@@ -22,6 +24,7 @@ void *MemoryAllocator::allocateUnalignedMemoryBlock(size_t sizeBytes_)
 
 	return static_cast<void*>(pMemory);
 }
+
 
 void *MemoryAllocator::allocateAlignedMemoryBlock(size_t sizeBytes_, size_t memoryAlignment_)
 {
@@ -56,6 +59,7 @@ void *MemoryAllocator::allocateAlignedMemoryBlock(size_t sizeBytes_, size_t memo
 	return static_cast<void*>(pAlignedMemory);
 }
 
+
 // Free the last unaligned aligned memory block.
 void *MemoryAllocator::freeUnalignedMemory(void * pMemory)
 {
@@ -65,6 +69,7 @@ void *MemoryAllocator::freeUnalignedMemory(void * pMemory)
 	void *pFreedMemory = reinterpret_cast<void*>(topMarker_);
 	return (pFreedMemory);
 }
+
 
 // Free the last aligned memory block.
 void MemoryAllocator::freeAlignedMemory(void * pMemory)
@@ -82,31 +87,5 @@ void MemoryAllocator::freeAlignedMemory(void * pMemory)
 	freeUnalignedMemory(pMemory);
 }
 
+
 MemoryAllocator::~MemoryAllocator() { delete[] memoryBlock_; }
-
-
-// **TODO
-//MemoryAllocator::MemoryAllocator(const MemoryAllocator &memory)
-//{
-//	memoryBlock_ = new unsigned char[sizeBytes_];
-//	for (int i = 0; i != sizeBytes_; ++i)
-//		memoryBlock_[i] = memory.memoryBlock_[i];
-//
-//}
-//
-//MemoryAllocator & MemoryAllocator::operator=(const MemoryAllocator &memory)
-//{
-//	unsigned char *p = new unsigned char[sizeBytes_];
-//	for (int i = 0; i != sizeBytes_; ++i)
-//		p[i] = memory.memoryBlock_[i];
-//	delete[] memory.memoryBlock_;
-//	memoryBlock_ = p;
-//	return *this;
-//
-//}
-//
-//MemoryAllocator::MemoryAllocator(MemoryAllocator &&memory)
-//{
-//	memoryBlock_ = memory.memoryBlock_;
-//	memory.memoryBlock_ = nullptr;
-//}

@@ -21,11 +21,6 @@ public:
 	virtual void* allocateAlignedMemoryBlock(size_t sizeBytes_, size_t memoryAlignment_);
 
 	virtual ~MemoryAllocator();
-
-	MemoryAllocator(const MemoryAllocator &memory);
-	MemoryAllocator &operator=(const MemoryAllocator &memory);
-	MemoryAllocator(MemoryAllocator &&memory);
-	MemoryAllocator &operator=(MemoryAllocator &&memory);
 	
 	// Free the memory to the marker used before last using the allocateMemoryInBlock() function.
 	virtual void* freeUnalignedMemory(void * pMemory);
